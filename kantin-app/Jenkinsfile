@@ -1,0 +1,35 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = "firdaaridzkii/kantin-backend:v2"
+    }
+
+    stages {
+       stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/firda888-r/Praktikum-Cloud.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'docker build -t $DOCKER_IMAGE .'
+            }
+        }
+
+        stage('Push') {
+            steps {
+                sh 'docker push $DOCKER_IMAGE'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh 'kubectl apply -f deployment.yaml'
+                sh 'kubectl apply -f service.yaml'
+                sh 'kubectl apply -f ingress.yaml'
+            }
+        }
+    }
+}
